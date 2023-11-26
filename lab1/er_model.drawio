@@ -1,0 +1,16 @@
+<mxfile host="app.diagrams.net" modified="2023-10-03T09:11:50.586Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36" etag="XIKCXHynJ3PTNsRnZrdm" version="21.7.5" type="device">
+  <diagram name="Страница — 1" id="3Qcw9OyHfB7RgX5Mrerf">
+    <mxGraphModel dx="756" dy="427" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4s5cYKbNPP2MEGcLxSjy-148" value="Классическое меропряитие " style="html=1;overflow=block;blockSpacing=1;swimlane;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;fontStyle=0;marginBottom=0;swimlaneFillColor=#c3f7c8;startSize=NaN;whiteSpace=wrap;fontSize=16.7;fontColor=#3a414a;spacing=0;strokeColor=#5e5e5e;strokeOpacity=100;fillOpacity=100;rounded=1;absoluteArcSize=1;arcSize=9;strokeWidth=2.3;fillColor=#c3f7c8;" vertex="1" parent="1">
+          <mxGeometry x="885" y="464" width="139" height="NaN" as="geometry" />
+        </mxCell>
+        <mxCell id="4s5cYKbNPP2MEGcLxSjy-149" value="Ссылка на регистрацию" style="part=1;resizeHeight=0;strokeColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;swimlaneFillColor=#c3f7c8;whiteSpace=wrap;fontSize=16.7;fontColor=#3a414a;fillColor=none;strokeOpacity=100;fillOpacity=100;" vertex="1" parent="4s5cYKbNPP2MEGcLxSjy-148">
+          <mxGeometry y="NaN" width="139" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
