@@ -31,7 +31,9 @@ GO
 USE lab_5_db;
 GO
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[partners]') AND type in (N'U'))
+IF  EXISTS (SELECT *
+FROM sys.objects
+WHERE object_id = OBJECT_ID(N'[dbo].[partners]') AND type in (N'U'))
 DROP TABLE [dbo].[partners]
 
 
@@ -68,7 +70,9 @@ MODIFY FILEGROUP f_group DEFAULT;
 -- Создание второй таблицы
 
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[events]') AND type in (N'U'))
+IF  EXISTS (SELECT *
+FROM sys.objects
+WHERE object_id = OBJECT_ID(N'[dbo].[events]') AND type in (N'U'))
 DROP TABLE [dbo].[events]
 
 CREATE TABLE events
@@ -118,7 +122,9 @@ CREATE SCHEMA my_schema
 
 GO
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[my_schema].[partners]') AND type in (N'U'))
+IF  EXISTS (SELECT *
+FROM sys.objects
+WHERE object_id = OBJECT_ID(N'[my_schema].[partners]') AND type in (N'U'))
 DROP TABLE [my_schema].[partners]
 
 
@@ -127,7 +133,9 @@ ALTER SCHEMA my_schema Transfer dbo.partners
 GO
 -- удаление схемы 
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[my_schema].[partners]') AND type in (N'U'))
+IF  EXISTS (SELECT *
+FROM sys.objects
+WHERE object_id = OBJECT_ID(N'[my_schema].[partners]') AND type in (N'U'))
 DROP TABLE [my_schema].[partners]
 
 DROP SCHEMA my_schema
