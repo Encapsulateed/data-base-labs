@@ -3,6 +3,7 @@ USE master;
 ALTER DATABASE [lab_5_db] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 DROP DATABASE [lab_5_db];
 
+
 -- Создание БД
 
 GO
@@ -26,13 +27,15 @@ ON
 );
 GO
 
+
+USE lab_5_db;
+GO
+
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[partners]') AND type in (N'U'))
 DROP TABLE [dbo].[partners]
 
 
-GO
-
--- Создание таблицы 
+-- Создание таблицы
 CREATE TABLE partners
 (
     partnerID INT PRIMARY KEY,
@@ -40,12 +43,12 @@ CREATE TABLE partners
     photo_url VARCHAR(255),
     parnter_url VARCHAR(255)
 );
-GO
+
 
 -- Создание файловую группу и добавление в нее файла, чтобы она не была пустой
 ALTER DATABASE lab_5_db
-
 ADD FILEGROUP f_group;
+
 ALTER DATABASE lab_5_db
 ADD FILE
 (
@@ -56,19 +59,18 @@ ADD FILE
     FILEGROWTH = 10MB
 )
 TO FILEGROUP f_group;
-GO
+
 
 -- Делаем файловой группой по умолчанию 
 ALTER DATABASE lab_5_db
 MODIFY FILEGROUP f_group DEFAULT;
 
 -- Создание второй таблицы
-GO
+
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[events]') AND type in (N'U'))
 DROP TABLE [dbo].[events]
 
-GO
 CREATE TABLE events
 (
     eventId INT PRIMARY KEY,
@@ -81,12 +83,12 @@ CREATE TABLE events
     event_place VARCHAR (255)
 );
 
--- Уадление файловой группы 
-GO
+DROP TABLE events;
 
+-- Уадление файловой группы 
+USE master;
 ALTER DATABASE lab_5_db
 ADD FILEGROUP f_group2;
-
 ALTER DATABASE lab_5_db
 ADD FILE
 (
@@ -98,18 +100,16 @@ ADD FILE
 )
 TO FILEGROUP f_group2;
 
-GO
+
 ALTER DATABASE lab_5_db
 MODIFY FILEGROUP f_group2 DEFAULT;
 
-ALTER DATABASE lab_5_db
-REMOVE FILE file_txt;
-
-ALTER DATABASE lab_5_db
-REMOVE FILEGROUP f_group;
+GO
+ALTER DATABASE lab_5_db REMOVE FILE file_txt;
+ALTER DATABASE lab_5_db REMOVE FILEGROUP f_group;
 
 -- Создание схемы 
-
+USE lab_5_db;
 GO
 DROP SCHEMA  IF EXISTS  my_schema 
 GO
@@ -120,11 +120,15 @@ GO
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[my_schema].[partners]') AND type in (N'U'))
 DROP TABLE [my_schema].[partners]
-GO
 
-ALTER SCHEMA my_schema Transfer dbo.partners
--- удаление схемы 
+
 GO
-DROP TABLE my_schema.partners
+ALTER SCHEMA my_schema Transfer dbo.partners
+GO
+-- удаление схемы 
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[my_schema].[partners]') AND type in (N'U'))
+DROP TABLE [my_schema].[partners]
+
 DROP SCHEMA my_schema
 GO
