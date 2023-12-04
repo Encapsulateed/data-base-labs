@@ -1,3 +1,4 @@
+
 USE master;
 ALTER DATABASE [lab_6_db] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 DROP DATABASE [lab_6_db];
@@ -7,7 +8,7 @@ GO
 CREATE DATABASE lab_6_db
 ON 
 ( 
-	NAME = lab_5_dat,
+	NAME = lab_6_dat,
 	FILENAME = 'C:\data-base-course\lab6dat.mdf',
 	SIZE = 5, 
 	MAXSIZE = UNLIMITED, 
@@ -16,7 +17,7 @@ ON
 LOG
 ON 
 ( 
-	NAME = lab_5_log,
+	NAME = lab_6_log,
 	FILENAME = 'C:\data-base-course\lab6log.log',
 	SIZE = 5,
 	MAXSIZE = UNLIMITED,
