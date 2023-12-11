@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-10-31T08:12:14.418Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36" etag="6En546PHbCMzgqkg_Oyr" version="22.0.8" type="device">
+<mxfile host="app.diagrams.net" modified="2023-12-11T22:33:28.996Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" etag="N4CTtIVgCsXaSDCrtg8B" version="22.1.7" type="device">
   <diagram name="Страница — 1" id="4O8kUrVgfWWRzuZz4_T4">
-    <mxGraphModel dx="3827" dy="1549" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1861" dy="440" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -226,13 +226,13 @@
         <mxCell id="Ap2EjRbPQU_Q-tLmrAUn-14" value="0..1" style="html=1;overflow=block;blockSpacing=1;whiteSpace=wrap;fontSize=16.7;fontColor=#008a0e;spacing=3.8;strokeOpacity=0;fillOpacity=0;rounded=1;absoluteArcSize=1;arcSize=9;fillColor=#ffffff;strokeWidth=2.3;lucidId=pd_v.Dd7xw_K;" parent="1" vertex="1">
           <mxGeometry x="1340" y="435" width="26" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="waDg7pJhGZTw2vwc2rZ6-1" value="Проект" style="html=1;overflow=block;blockSpacing=1;whiteSpace=wrap;fontSize=25;fontColor=#5d646f;fontStyle=1;align=center;spacing=3.8;strokeColor=#5e5e5e;strokeOpacity=100;fillOpacity=100;rounded=1;absoluteArcSize=1;arcSize=9;fillColor=#c3f7c8;strokeWidth=2.3;lucidId=O6-v.UfuWuvX;" vertex="1" parent="1">
+        <mxCell id="waDg7pJhGZTw2vwc2rZ6-1" value="Проект" style="html=1;overflow=block;blockSpacing=1;whiteSpace=wrap;fontSize=25;fontColor=#5d646f;fontStyle=1;align=center;spacing=3.8;strokeColor=#5e5e5e;strokeOpacity=100;fillOpacity=100;rounded=1;absoluteArcSize=1;arcSize=9;fillColor=#c3f7c8;strokeWidth=2.3;lucidId=O6-v.UfuWuvX;" parent="1" vertex="1">
           <mxGeometry x="508" y="553" width="255" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="waDg7pJhGZTw2vwc2rZ6-2" value="0.N" style="html=1;overflow=block;blockSpacing=1;whiteSpace=wrap;fontSize=16.7;fontColor=#008a0e;spacing=3.8;strokeOpacity=0;fillOpacity=0;rounded=1;absoluteArcSize=1;arcSize=9;fillColor=#ffffff;strokeWidth=2.3;lucidId=jd_vixfrtFJN;" vertex="1" parent="1">
+        <mxCell id="waDg7pJhGZTw2vwc2rZ6-2" value="0.N" style="html=1;overflow=block;blockSpacing=1;whiteSpace=wrap;fontSize=16.7;fontColor=#008a0e;spacing=3.8;strokeOpacity=0;fillOpacity=0;rounded=1;absoluteArcSize=1;arcSize=9;fillColor=#ffffff;strokeWidth=2.3;lucidId=jd_vixfrtFJN;" parent="1" vertex="1">
           <mxGeometry x="780" y="552" width="26" height="45" as="geometry" />
         </mxCell>
-        <mxCell id="waDg7pJhGZTw2vwc2rZ6-3" value="&lt;div style=&quot;display: flex; justify-content: flex-start; text-align: left; align-items: baseline; line-height: 1.25; margin-top: -2px;&quot;&gt;&lt;font color=&quot;#3a414a&quot;&gt;&lt;span style=&quot;font-size: 16.7px;&quot;&gt;&lt;b&gt;ID: Название&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" style="html=1;overflow=block;blockSpacing=1;whiteSpace=wrap;fontSize=13;align=left;spacing=3.8;verticalAlign=middle;strokeColor=none;fillOpacity=0;fillColor=#ffffff;strokeWidth=0;lucidId=q2-vYc7dDzM8;" vertex="1" parent="1">
+        <mxCell id="waDg7pJhGZTw2vwc2rZ6-3" value="&lt;div style=&quot;display: flex; justify-content: flex-start; text-align: left; align-items: baseline; line-height: 1.25; margin-top: -2px;&quot;&gt;&lt;font color=&quot;#3a414a&quot;&gt;&lt;span style=&quot;font-size: 16.7px;&quot;&gt;&lt;b&gt;ID: Название&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" style="html=1;overflow=block;blockSpacing=1;whiteSpace=wrap;fontSize=13;align=left;spacing=3.8;verticalAlign=middle;strokeColor=none;fillOpacity=0;fillColor=#ffffff;strokeWidth=0;lucidId=q2-vYc7dDzM8;" parent="1" vertex="1">
           <mxGeometry x="508" y="842" width="247" height="48" as="geometry" />
         </mxCell>
       </root>
