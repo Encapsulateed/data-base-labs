@@ -1,75 +1,39 @@
-
 USE lab_10_db;
 
+
+
+-- ГРЯЗНОЕ ЧТЕНИЕ
+
 /*
-SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
-SET TRANSACTION ISOLATION LEVEL READ COMMITTED
-SET TRANSACTION ISOLATION LEVEL REPEATABLE READ
-SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
+
+ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED -- считали данные из незакомиченной транзакции, но ведь оно НИКОГДА не запишется в БД из-за ролбека
+-- SET TRANSACTION ISOLATION LEVEL READ COMMITTED -- чтение запрещено т.к Транзакция 1 не закомичена
+
+BEGIN TRANSACTION
+
+SELECT * FROM events WHERE eventId =1 ;
+
+COMMIT TRANSACTION;
+
+
+
+-- НЕПОВТОРЯЮЩЕСЯ ЧТЕНИЕ
+
+
+BEGIN TRANSACTION;
+
+UPDATE events 
+SET descr = 'НЕПОВТОРНОЕ ЧТЕНИЕ ОБНОВЛЕНИЕ'
+WHERE eventId = 1;
+
+COMMIT TRANSACTION
 */
 
--- dirty read
-
--- Транзакция 1
--- Изменение данных, но не зафиксировано
-BEGIN TRANSACTION;
-    UPDATE events SET title = 'Новое событие 1' WHERE eventId = 1;
-
-    -- Пауза, чтобы другая транзакция могла прочитать данные
-    WAITFOR DELAY '00:00:01';
-
--- Транзакция 2
--- Чтение данных из транзакции 1 (грязное чтение)
--- Она видит изменения, которые еще не были зафиксированы
--- Запрос блокируется, пока транзакция 1 не завершится
-SELECT * FROM events;
-
--- Завершение транзакции 1 (фиксация изменений)
-COMMIT TRANSACTION;
+-- ФАНТОМНОЕ ЧТЕНИЕ;
 
 
--- phantom read
--- Транзакция 1
--- Чтение данных из таблицы
-BEGIN TRANSACTION;
-    SELECT * FROM events;
+BEGIN TRAN;
 
-    -- ждём, чтобы другая транзакция могла вставить новые строки
-    WAITFOR DELAY '00:00:05';
+INSERT INTO events VALUES (4, 'Событие 4', 'Описание события 4'), (5, 'Событие 5', 'Описание события 5');
 
--- Транзакция 2
--- Вставка новых строк
-BEGIN TRANSACTION;
-    INSERT INTO events VALUES (4, 'Событие 4', 'Описание события 4');
-    INSERT INTO events VALUES (5, 'Событие 5', 'Описание события 5');
-COMMIT TRANSACTION;
-
--- Завершение транзакции 1
-COMMIT TRANSACTION;
-
--- Транзакция 3
--- Чтение данных из таблицы после вставки новых строк в транзакции 2 (фантомное чтение)
-SELECT * FROM events;
-
-
--- nonrepeatable read
-
--- Транзакция 1
--- Чтение данных из таблицы
-BEGIN TRANSACTION;
-    SELECT * FROM events;
-
--- Транзакция 2
--- Изменение данных, читаемых первой транзакцией
-BEGIN TRANSACTION;
-    UPDATE events SET title = 'Новое событие 1' WHERE eventId = 1;
-COMMIT TRANSACTION;
-
--- Завершение транзакции 1
-COMMIT TRANSACTION;
-
--- Чтение данных из таблицы после изменения в транзакции 2 (неповторяющееся чтение)
-SELECT * FROM events;
-
--- Очистка: Удаление таблицы events
-DROP TABLE events;
+COMMIT TRAN;
