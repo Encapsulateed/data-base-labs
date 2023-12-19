@@ -81,7 +81,6 @@ BEGIN
 		UPDATE lab_13_1_db.dbo.partners SET title = (SELECT title
 		FROM inserted
 		WHERE inserted.partnerId = lab_13_1_db.dbo.partners.partnerId)
-
 				  WHERE (EXISTS (SELECT *
 		FROM inserted
 		WHERE (lab_13_1_db.dbo.partners.partnerId = inserted.partnerId AND link IS NOT NULL)));
@@ -93,7 +92,7 @@ BEGIN
 		FROM inserted
 		WHERE inserted.partnerId = lab_13_2_db.dbo.partners.partnerId)
 
-		  WHERE (EXISTS (SELECT *
+		WHERE (EXISTS (SELECT *
 		FROM inserted
 		WHERE (lab_13_2_db.dbo.partners.partnerId = inserted.partnerId AND title IS NOT NULL)));
 	END;

@@ -59,15 +59,12 @@ GO
 
 CREATE TABLE events
 (
-	eventId INT PRIMARY KEY,
+	eventId INT PRIMARY KEY CHECK (eventId < 5),
 	title VARCHAR(255) NOT NULL DEFAULT 'нет названия',
 	descr VARCHAR(1000) NOT NULL DEFAULT 'нет описания'
 );
-INSERT INTO events
-VALUES
-	(1, 'Событие 1 1', 'Описание события 1 1'),
-	(2, 'Событие 2 1', 'Описание события 2 1'),
-	(3, 'Событие 3 1', 'Описание события 3 1');
+
+
 
 GO
 
@@ -80,15 +77,10 @@ GO
 
 CREATE TABLE events
 (
-	eventId INT PRIMARY KEY,
+	eventId INT PRIMARY KEY CHECK (eventId >= 5),
 	title VARCHAR(255) NOT NULL DEFAULT 'нет названия',
 	descr VARCHAR(1000) NOT NULL DEFAULT 'нет описания'
 );
-INSERT INTO events
-VALUES
-	(1, 'Событие 1 2', 'Описание события 1 2'),
-	(2, 'Событие 2 2', 'Описание события 2 2'),
-	(3, 'Событие 3 2', 'Описание события 3 2');
 
 
 
@@ -97,6 +89,9 @@ VALUES
 
 GO
 DROP VIEW IF EXISTS my_events_vies
+GO
+
+EXEC sp_serveroption 'DESKTOP-N89AMNR', 'lazy schema validation', 'true';
 GO
 CREATE VIEW my_events_vies
 AS
@@ -107,19 +102,36 @@ AS
 		FROM lab_13_2_db.dbo.events;
 GO
 
-INSERT INTO lab_13_1_db.dbo.events
+INSERT INTO my_events_vies
 VALUES
-	(4, 'новое событие 1', 'УРА СОБЫТИЕ 1'),
-	(5, 'новое событие 2', 'УРА СОБЫТИЕ 2')
+	(1, 'Событие 1', 'Описание события 1 1'),
+	(2, 'Событие 2', 'Описание события 3 1'),
+	(3, 'новое событие 3', 'УРА СОБЫТИЕ 2'),
+	(4, 'Событие 4', 'Описание события 1 1'),
+	(5, 'Событие 5', 'Описание события 3 1'),
+	(6, 'новое событие 6', 'УРА СОБЫТИЕ 2'),
+	(7, 'Событие 7', 'Описание события 1 1'),
+	(8, 'Событие 8', 'Описание события 3 1'),
+	(9, 'новое событие 9', 'УРА СОБЫТИЕ 2')
+
 
 -- SELECT * FROM my_events_vies;
 
-UPDATE lab_13_2_db.dbo.events SET descr = 'ЭТО СОБЫТИЕ БЫЛО УДАЛЕНО ИЗ-ЗА НАРУШЕНИЯ АВТОРСКИХ ПРАВ!' WHERE eventId = 1;
-UPDATE lab_13_2_db.dbo.events SET title = '[ДАННЫЕ УДАЛЕНЫ]' WHERE eventId = 1;
+UPDATE my_events_vies SET descr = 'ЭТО СОБЫТИЕ БЫЛО УДАЛЕНО ИЗ-ЗА НАРУШЕНИЯ АВТОРСКИХ ПРАВ!' WHERE eventId = 1;
+UPDATE my_events_vies SET title = '[ДАННЫЕ УДАЛЕНЫ]' WHERE eventId = 1;
+UPDATE my_events_vies SET eventId = 10 WHERE eventId = 1;
+
+
 
 -- SELECT * FROM my_events_vies;
 
 DELETE FROM lab_13_1_db.dbo.events WHERE eventId = 5;
 
+SELECT *
+FROM lab_13_1_db.dbo.events;
 
-SELECT * FROM my_events_vies;
+SELECT *
+FROM lab_13_2_db.dbo.events;
+
+SELECT *
+FROM my_events_vies;

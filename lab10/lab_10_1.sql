@@ -1,25 +1,23 @@
 USE lab_10_db;
 
 
-
+/*
 -- ГРЯЗНОЕ ЧТЕНИЕ
 
-/*
-
- SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED -- считали данные из незакомиченной транзакции, но ведь оно НИКОГДА не запишется в БД из-за ролбека
--- SET TRANSACTION ISOLATION LEVEL READ COMMITTED -- чтение запрещено т.к Транзакция 1 не закомичена
+-- SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED -- считали данные из незакомиченной транзакции, но ведь оно НИКОГДА не запишется в БД из-за ролбека
+ SET TRANSACTION ISOLATION LEVEL READ COMMITTED -- чтение запрещено т.к Транзакция 1 не закомичена
 
 BEGIN TRANSACTION
 
-SELECT * FROM events WHERE eventId =1 ;
+SELECT * FROM events WHERE eventId = 1 ;
 
 COMMIT TRANSACTION;
 
-
+*/
 
 -- НЕПОВТОРЯЮЩЕСЯ ЧТЕНИЕ
 
-
+/*
 BEGIN TRANSACTION;
 
 UPDATE events 
@@ -27,8 +25,8 @@ SET descr = 'НЕПОВТОРНОЕ ЧТЕНИЕ ОБНОВЛЕНИЕ'
 WHERE eventId = 1;
 
 COMMIT TRANSACTION
-*/
 
+*/
 -- ФАНТОМНОЕ ЧТЕНИЕ;
 
 

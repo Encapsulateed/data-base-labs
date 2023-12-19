@@ -92,6 +92,8 @@ BEGIN
     END
 END;
 
+
+
 GO
 
 CREATE TRIGGER delete_trigger

@@ -48,14 +48,22 @@ VALUES
 	(3, 'Событие 3', 'Описание события 3');
 
 
+-- READ UNCOMMITTED  читаем незакомиченные данные , которые могут быть изменены или удалены другой транзакцией, но еще не зафиксированы
 
--- ГРЯЗНОЕ ЧТЕНИЕ
+-- READ COMMITTED читаем только закомиченные данные предотвращая грязное чтение. Однако, другие проблемы, 
+-- такие как неповторяющееся чтение и фантомное чтение, могут возникнуть.
+
+-- REPEATABLE READ предотвращает неповторяющееся чтение, гарантируя, что все считанные данные останутся неизменными в течение всей транзакции
+
+-- SERIALIZABLE предоставляет максимальную степень изоляции, блокируя данные так, чтобы никакие другие транзакции не могли их изменить или считать
+
 /*
-BEGIN TRANSACTION
+-- ГРЯЗНОЕ ЧТЕНИЕ
 
+BEGIN TRANSACTION
 UPDATE events SET descr = 'Обновлённое описание 1' WHERE eventId = 1;
 
-WAITFOR DELAY '00:00:5';
+WAITFOR DELAY '00:00:05';
 
 ROLLBACK;
 SELECT * FROM events WHERE eventId =1 ;
@@ -80,17 +88,18 @@ WHERE eventId = 1;
 
 COMMIT;
 */
+/**/
 
 -- ФАНТОМНОЕ ЧТЕНИЕ 
 
--- SET TRANSACTION ISOLATION LEVEL REPEATABLE READ -- получим 2 разных результата на SELECT, т.к вторая транзакция добавит строки
- SET TRANSACTION ISOLATION LEVEL SERIALIZABLE  -- вторая транзакция будет ждать эту 
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ -- получим 2 разных результата на SELECT, т.к вторая транзакция добавит строки
+ --SET TRANSACTION ISOLATION LEVEL SERIALIZABLE  -- вторая транзакция будет ждать эту 
 BEGIN TRAN;
 
 SELECT *
 FROM events;
 
-WAITFOR DELAY '00:00:10'
+WAITFOR DELAY '00:00:05'
 
 SELECT *
 FROM events;
