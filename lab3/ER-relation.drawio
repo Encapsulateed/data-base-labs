@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-12-11T22:33:26.220Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36" etag="kq8JxCDZ4FmZLPsOLyJr" version="22.1.7" type="device">
+<mxfile host="app.diagrams.net" modified="2023-12-20T20:31:14.964Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" etag="-pk4PTr9GTxuJbE-Df9z" version="22.1.11" type="device">
   <diagram id="aGIFhMdzsM98lvhKbbP2" name="Rel">
-    <mxGraphModel dx="1861" dy="1609" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1981" dy="1683" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -442,6 +442,11 @@
             <mxPoint x="540" y="70" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="yNHhKKRUCZ4gWDLFDOQZ-1" value="Мероприятие - Хардатон" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="I134rd438eyBnRnEvHKw-205">
+          <mxGeometry x="-0.6697" y="1" relative="1" as="geometry">
+            <mxPoint x="3" y="-19" as="offset" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="I134rd438eyBnRnEvHKw-206" value="" style="endArrow=none;html=1;rounded=0;fontStyle=0" parent="1" target="I134rd438eyBnRnEvHKw-27" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="129.60000000000002" y="70" as="sourcePoint" />
@@ -519,15 +524,18 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="7mcDqr7fuQIiHiMMQimq-3" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERzeroToOne;startArrow=ERmandOne;rounded=0;exitX=1.006;exitY=0.911;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontStyle=0" parent="1" source="I134rd438eyBnRnEvHKw-63" target="I134rd438eyBnRnEvHKw-177" edge="1">
+        <mxCell id="7mcDqr7fuQIiHiMMQimq-3" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERzeroToOne;startArrow=ERmandOne;rounded=0;exitX=0.002;exitY=0.262;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontStyle=0" parent="1" source="I134rd438eyBnRnEvHKw-177" target="I134rd438eyBnRnEvHKw-63" edge="1">
           <mxGeometry width="100" height="100" relative="1" as="geometry">
-            <mxPoint x="610" y="710" as="sourcePoint" />
-            <mxPoint x="710" y="610" as="targetPoint" />
+            <mxPoint x="489.99999999999994" y="809.9999999999999" as="sourcePoint" />
+            <mxPoint x="638.92" y="842.67" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="600" y="860" />
+            </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="7mcDqr7fuQIiHiMMQimq-4" value="Участник является&lt;br&gt;капитаном команды" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=0" parent="7mcDqr7fuQIiHiMMQimq-3" vertex="1" connectable="0">
           <mxGeometry x="-0.3567" y="3" relative="1" as="geometry">
-            <mxPoint x="19" y="14" as="offset" />
+            <mxPoint x="-17" y="-17" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="7mcDqr7fuQIiHiMMQimq-17" value="" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERzeroToMany;startArrow=ERmandOne;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontStyle=0" parent="1" source="I134rd438eyBnRnEvHKw-53" target="I134rd438eyBnRnEvHKw-228" edge="1">
@@ -562,7 +570,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="SjiSp5OogTzmZZQgio8d-6" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(251, 251, 251); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;🔑 ParticipantId&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;fontStyle=0" parent="1" vertex="1">
-          <mxGeometry x="730" y="575" width="100" height="20" as="geometry" />
+          <mxGeometry x="740" y="575" width="100" height="20" as="geometry" />
         </mxCell>
         <mxCell id="SjiSp5OogTzmZZQgio8d-8" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(251, 251, 251); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;🔑 ComandId&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;fontStyle=0" parent="1" vertex="1">
           <mxGeometry x="400" y="595" width="100" height="20" as="geometry" />
@@ -727,6 +735,9 @@
         </mxCell>
         <mxCell id="SjiSp5OogTzmZZQgio8d-103" value="На мероприятии есть команда&amp;nbsp;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=0" parent="1" vertex="1" connectable="0">
           <mxGeometry x="810" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="yNHhKKRUCZ4gWDLFDOQZ-2" value="Мероприятие - Классическое &lt;br&gt;мероприятие&amp;nbsp;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="469.9985714285713" y="50" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

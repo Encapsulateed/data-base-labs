@@ -55,17 +55,19 @@ GO
 CREATE VIEW hardaton_partners_view
 AS
     SELECT one.hardatonId, two.projectId, one.title, two.project_title
-    FROM lab_13_1_db.dbo.hardatons AS one JOIN lab_13_2_db.dbo.projects AS two
+    FROM lab_13_1_db.dbo.hardatons AS one INNER JOIN lab_13_2_db.dbo.projects AS two
         ON one.hardatonId = two.hardatonId;
 
 GO
 
-DROP TRIGGER IF EXISTS insert_update_trigger;
+DROP TRIGGER IF EXISTS insert_trigger;
+DROP TRIGGER IF EXISTS update_trigger;
 DROP TRIGGER IF EXISTS delete_trigger;
 
 GO
 
-CREATE TRIGGER insert_update_trigger  ON hardaton_partners_view INSTEAD OF INSERT AS
+CREATE TRIGGER insert_trigger  ON hardaton_partners_view INSTEAD OF INSERT
+AS
 BEGIN
     IF EXISTS (
         SELECT 1
@@ -92,10 +94,27 @@ BEGIN
     END
 END;
 
+GO
+-- Создание триггера для каскадного обновления проектов через представление
+CREATE TRIGGER update_trigger
+ON hardaton_partners_view
+INSTEAD OF UPDATE    
+AS
+BEGIN
+    IF (UPDATE(hardatonId))
+    BEGIN
+        RAISERROR ('Я запрещаю вам обновляться', 16, 1);
+        ROLLBACK
+    END;
 
+   IF (UPDATE(title))
+	BEGIN
+		UPDATE lab_13_1_db.dbo.hardatons SET title = (SELECT title FROM inserted 
+        WHERE inserted.hardatonId = lab_13_1_db.dbo.hardatons.hardatonId);
+	END;
+END;
 
 GO
-
 CREATE TRIGGER delete_trigger
 ON hardaton_partners_view
 INSTEAD OF DELETE
@@ -110,16 +129,27 @@ GO
 
 USE lab_13_2_db
 
+-- UPDATE hardaton_partners_view SET hardatonId = 10 WHERE hardatonId =1; -- ошибка
+-- UPDATE hardaton_partners_view SET projectId = 10 WHERE projectId =1;
+UPDATE hardaton_partners_view SET title = 'NEW TITLE' WHERE hardatonId = 1;
+SELECT *
+FROM hardaton_partners_view;
+
+/*
 INSERT INTO hardaton_partners_view
     (hardatonId,projectId,title,project_title)
 VALUES
-    (3, 1, '1', 'ХУЙ');
+    (3, 1, 'НАВЗВАНИЕ 3', 'НАЗВАНЕИ ПРОЕКТА 3');
+*/
 
 
-SELECT *
-FROM hardaton_partners_view;
-
+/*
 DELETE FROM hardaton_partners_view WHERE hardatonId =1;
 
+
 SELECT *
 FROM hardaton_partners_view;
+
+SELECT *
+FROM lab_13_1_db.dbo.events;
+*/
