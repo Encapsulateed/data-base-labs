@@ -47,109 +47,87 @@ VALUES
 --2. Создать необходимые элементы базы данных (представления, триггеры), обеспечивающие работу
 --с данными связанных таблиц (выборку, вставку, изменение, удаление).
 
-
+DROP VIEW IF EXISTS hardaton_project_view;
 GO
-DROP VIEW IF EXISTS hardaton_partners_view
-GO
-
-CREATE VIEW hardaton_partners_view
+CREATE VIEW hardaton_project_view
 AS
-    SELECT one.hardatonId, two.projectId, one.title, two.project_title
-    FROM lab_13_1_db.dbo.hardatons AS one INNER JOIN lab_13_2_db.dbo.projects AS two
-        ON one.hardatonId = two.hardatonId;
+    SELECT h.hardatonId, h.title, p.projectId, p.project_title
+    FROM projects AS p JOIN lab_13_1_db.dbo.hardatons AS h ON p.hardatonId = h.hardatonId;
 
 GO
 
-DROP TRIGGER IF EXISTS insert_trigger;
-DROP TRIGGER IF EXISTS update_trigger;
-DROP TRIGGER IF EXISTS delete_trigger;
+DROP TRIGGER IF EXISTS update_hardaton;
+DROP TRIGGER IF EXISTS delete_hardaton;
 
+USE lab_13_1_db;
 GO
-
-CREATE TRIGGER insert_trigger  ON hardaton_partners_view INSTEAD OF INSERT
-AS
+CREATE TRIGGER update_hardaton ON hardatons AFTER UPDATE AS
 BEGIN
-    IF EXISTS (
-        SELECT 1
-    FROM inserted i
-        LEFT JOIN lab_13_1_db.dbo.hardatons one ON i.hardatonId = one.hardatonId
-    WHERE one.hardatonId IS NULL
-    )
+    IF(UPDATE(hardatonId))
     BEGIN
-        RAISERROR ('Invalid hardatonId. The referenced hardaton does not exist.', 16, 1);
+        RAISERROR('Я запрещаю вам обновляться',10,10);
         ROLLBACK;
-    END
-    ELSE
-    BEGIN
-        -- Продолжите с вставкой данных, если проверка успешна
-        INSERT INTO lab_13_1_db.dbo.hardatons
-            (hardatonId,title)
-        SELECT hardatonId, title
-        FROM inserted;
-
-        INSERT INTO lab_13_2_db.dbo.projects
-            (projectId,project_title ,hardatonId)
-        SELECT projectId, project_title, hardatonId
-        FROM inserted;
-    END
-END;
-
-GO
--- Создание триггера для каскадного обновления проектов через представление
-CREATE TRIGGER update_trigger
-ON hardaton_partners_view
-INSTEAD OF UPDATE    
-AS
-BEGIN
-    IF (UPDATE(hardatonId))
-    BEGIN
-        RAISERROR ('Я запрещаю вам обновляться', 16, 1);
-        ROLLBACK
     END;
-
-   IF (UPDATE(title))
-	BEGIN
-		UPDATE lab_13_1_db.dbo.hardatons SET title = (SELECT title FROM inserted 
-        WHERE inserted.hardatonId = lab_13_1_db.dbo.hardatons.hardatonId);
-	END;
 END;
-
 GO
-CREATE TRIGGER delete_trigger
-ON hardaton_partners_view
-INSTEAD OF DELETE
-AS
+CREATE TRIGGER delete_hardaton ON hardatons INSTEAD OF DELETE AS
 BEGIN
-    DELETE FROM lab_13_2_db.dbo.projects
-    WHERE hardatonId IN (SELECT deleted.hardatonId
+    -- Сначала удалим все дочерние проекты 
+    DELETE FROM lab_13_2_db.dbo.projects WHERE hardatonId =(SELECT hardatonId
+    FROM deleted);
+
+    DELETE FROM lab_13_1_db.dbo.hardatons WHERE hardatonId =(SELECT hardatonId
     FROM deleted);
 END;
 GO
 
 
-USE lab_13_2_db
+USE lab_13_2_db;
+DROP TRIGGER IF EXISTS insert_project;
+DROP TRIGGER IF EXISTS update_project;
 
--- UPDATE hardaton_partners_view SET hardatonId = 10 WHERE hardatonId =1; -- ошибка
--- UPDATE hardaton_partners_view SET projectId = 10 WHERE projectId =1;
-UPDATE hardaton_partners_view SET title = 'NEW TITLE' WHERE hardatonId = 1;
-SELECT *
-FROM hardaton_partners_view;
+
+
+GO
+CREATE TRIGGER insert_project ON projects AFTER INSERT AS
+BEGIN
+    IF(NOT EXISTS (SELECT *
+    FROM lab_13_1_db.dbo.hardatons
+    WHERE hardatonId = (SELECT hardatonId
+    FROM inserted)))
+    BEGIN
+        RAISERROR('Такого хардатона не существует !',10,10);
+        ROLLBACK;
+    END;
+END;
+GO
+
+GO
+CREATE TRIGGER update_project ON projects AFTER UPDATE AS
+BEGIN
+    IF(UPDATE(hardatonId))
+    BEGIN
+        RAISERROR('Я запрещаю вам обновляться',10,10);
+        ROLLBACK;
+    END;
+END
+GO
+
 
 /*
-INSERT INTO hardaton_partners_view
-    (hardatonId,projectId,title,project_title)
+INSERT INTO projects
 VALUES
-    (3, 1, 'НАВЗВАНИЕ 3', 'НАЗВАНЕИ ПРОЕКТА 3');
+    (18, 'Проект 18', 10)
 */
 
+--DELETE FROM projects WHERE projectId = 1;
 
-/*
-DELETE FROM hardaton_partners_view WHERE hardatonId =1;
+USE lab_13_1_db;
+
+--DELETE FROM hardatons WHERE hardatonId = 2;
+--UPDATE hardatons SET title = 'Title 2' WHERE hardatonId =2;
 
 
+USE lab_13_2_db;
 SELECT *
-FROM hardaton_partners_view;
-
-SELECT *
-FROM lab_13_1_db.dbo.events;
-*/
+from hardaton_project_view;
