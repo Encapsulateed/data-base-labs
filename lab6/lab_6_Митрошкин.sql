@@ -87,7 +87,7 @@ DROP TABLE [dbo].[Participants]
 
 CREATE TABLE Participants
 (
-    ParticipantID INT PRIMARY KEY,
+    ParticipantID INT IDENTITY(1,1) PRIMARY KEY ,
     fio VARCHAR(255),
     comandId INT NOT NULL,
 
@@ -100,11 +100,11 @@ CREATE TABLE Participants
 INSERT INTO Comands (title)  VALUES('Боевые коты'); -- 1
 INSERT INTO Comands (title)  VALUES('Боевые коты 2'); -- 2
 
-INSERT INTO Participants (ParticipantID, fio, comandId)  VALUES(0,'Вася Пупкин',1); 
-INSERT INTO Participants (ParticipantID, fio, comandId)  VALUES(1,'Владимир Владимирович',1); 
+INSERT INTO Participants ( fio, comandId)  VALUES('Вася Пупкин',1); 
+INSERT INTO Participants ( fio, comandId)  VALUES('Владимир Владимирович',1); 
 
-INSERT INTO Participants (ParticipantID, fio, comandId)  VALUES(2,'Алексей Алекеев Алеексевич ',2); 
-INSERT INTO Participants (ParticipantID, fio, comandId)  VALUES(3,'Бояринов Роман Николавевич',2); 
+INSERT INTO Participants (fio, comandId)  VALUES('Алексей Алекеев Алеексевич ',2); 
+INSERT INTO Participants ( fio, comandId)  VALUES('Бояринов Роман Николавевич',2); 
 
 
 DELETE FROM Comands WHERE ComandId = 2;
