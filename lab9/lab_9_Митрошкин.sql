@@ -34,14 +34,7 @@ CREATE SEQUENCE user_id_sequence
 	START WITH 1
 	INCREMENT BY 1;
 
-IF EXISTS (SELECT *
-FROM sys.sequences
-WHERE NAME = N'address_id_sequence')
-DROP SEQUENCE user_id_sequence
 
-CREATE SEQUENCE address_id_sequence 
-	START WITH 1
-	INCREMENT BY 1;
 
 
 IF  EXISTS (SELECT *
@@ -66,13 +59,12 @@ GO
 
 CREATE TABLE Addresses
 (
-	AddressId INT PRIMARY KEY NOT NULL DEFAULT (NEXT VALUE FOR dbo.address_id_sequence),
 	userId INT,
 	street NVARCHAR(255),
-	city NVARCHAR(255)
+	city NVARCHAR(255),
 
-		FOREIGN KEY (userId) REFERENCES Users(userId)
-		CONSTRAINT UC_UserId UNIQUE (userId),
+	FOREIGN KEY (userId) REFERENCES Users(userId),
+	CONSTRAINT UC_UserId UNIQUE (userId),
 	CONSTRAINT UC_uniqAdr UNIQUE (street,city)
 );
 
@@ -204,11 +196,36 @@ GO
 GO
 CREATE TRIGGER delete_view_tringger ON UserAddressView INSTEAD OF DELETE AS
 BEGIN
-	DELETE FROM Users WHERE userId = (SELECT userId
-	FROM deleted)
 
-	DELETE FROM Addresses WHERE userId = (SELECT userId
-	FROM deleted)
+	DECLARE for_delete_cursor CURSOR FOR SELECT userId
+	FROM deleted;
+	DECLARE @userId INT;
+
+
+	OPEN for_delete_cursor;
+
+	FETCH NEXT FROM for_delete_cursor INTO @userId;
+	WHILE @@FETCH_STATUS = 0
+    BEGIN
+
+
+		IF(NOT EXISTS (SELECT 1 FROM Users WHERE userId = @userId))
+		BEGIN
+			RAISERROR('No such user',10,0)
+			ROLLBACK;
+		END;
+
+		DELETE FROM Users WHERE userId = @userId
+
+		DELETE FROM Addresses WHERE userId = @userId
+
+		FETCH NEXT FROM for_delete_cursor INTO @userId;
+	END;
+
+	CLOSE for_delete_cursor;
+	DEALLOCATE for_delete_cursor;
+
+
 
 END;
 
@@ -226,6 +243,7 @@ VALUES('Митрошкин Алексей Антонович', 'Москва', '
 UPDATE UserAddressView SET fio = 'Токарев Иван' WHERE userId = 3;
 UPDATE UserAddressView SET street = 'Yjdjjjasdjaslk0000' WHERE userId = 3;
 
-DELETE FROM UserAddressView WHERE userId = 1;
+
+DELETE FROM UserAddressView WHERE userId > 2;
 SELECT *
 FROM UserAddressView;
