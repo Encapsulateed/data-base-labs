@@ -26,7 +26,7 @@ WHERE eventId = 1;
 
 COMMIT TRANSACTION
 
-*/
+
 -- ФАНТОМНОЕ ЧТЕНИЕ;
 
 
@@ -35,3 +35,4 @@ BEGIN TRAN;
 INSERT INTO events VALUES (4, 'Событие 4', 'Описание события 4'), (5, 'Событие 5', 'Описание события 5');
 
 COMMIT TRAN;
+*/

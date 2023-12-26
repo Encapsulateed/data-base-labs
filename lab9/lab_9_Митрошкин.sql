@@ -180,12 +180,12 @@ BEGIN
 END
 GO
 
--- Удалние 
+-- Удаление 
 CREATE TRIGGER delete_view_tringger ON ComandParticipantsView INSTEAD OF DELETE AS 
 BEGIN
+
+	print (SELECT * FROM deleted)
 	DELETE FROM Comands WHERE ComandId IN (SELECT ComandId
-	FROM deleted)
-	DELETE FROM Participants WHERE ParticipantID IN (SELECT ParticipantID
 	FROM deleted)
 
 END
@@ -194,30 +194,40 @@ GO
 
 INSERT INTO Comands
 	(title)
-VALUES('Боевые роботы');
+VALUES('Команда 1');
 -- 1
 INSERT INTO Comands
 	(title)
-VALUES('Боевые коты 2');
--- 2
+VALUES('Команда 2');
+
 
 INSERT INTO Participants
 	( fio, comandId)
 VALUES('Митрошкин Алексей', 1);
 INSERT INTO Participants
 	( fio, comandId)
-VALUES('Митрошкин Алексей 2', 1);
+VALUES('Токарев Иван', 1);
 
+
+INSERT INTO Participants
+	( fio, comandId)
+VALUES('Василий Пупкин', 2);
+INSERT INTO Participants
+	( fio, comandId)
+VALUES('Дмитрий Дмитриев', 2);
 
 /*
 INSERT INTO Participants
-	(ParticipantID, fio, comandId)
-VALUES(2, 'Гречко', 1);
+	( fio, comandId)
+VALUES('Гречко', 1);
 */
 -- Выдаст ошибку по триггеру на вставку 
 
--- DELETE FROM Participants WHERE ParticipantID >0;
+--DELETE FROM Participants WHERE ParticipantID >0;
 
+--DELETE FROM ComandParticipantsView WHERE ComandId = 2;
+DELETE FROM ComandParticipantsView WHERE ParticipantID = 4;
 
 SELECT *
 FROM ComandParticipantsView;
+
