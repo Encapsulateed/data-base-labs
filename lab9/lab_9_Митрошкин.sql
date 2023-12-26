@@ -22,77 +22,72 @@ ON
 	FILEGROWTH = 5
 );
 GO
-
 USE lab_9_db;
 
 
 IF EXISTS (SELECT *
 FROM sys.sequences
-WHERE NAME = N'comand_id_sequence')
-DROP SEQUENCE comand_id_sequence
+WHERE NAME = N'user_id_sequence')
+DROP SEQUENCE user_id_sequence
 
-CREATE SEQUENCE comand_id_sequence 
+CREATE SEQUENCE user_id_sequence 
 	START WITH 1
 	INCREMENT BY 1;
 
+IF EXISTS (SELECT *
+FROM sys.sequences
+WHERE NAME = N'address_id_sequence')
+DROP SEQUENCE user_id_sequence
+
+CREATE SEQUENCE address_id_sequence 
+	START WITH 1
+	INCREMENT BY 1;
+
+
 IF  EXISTS (SELECT *
 FROM sys.objects
-WHERE object_id = OBJECT_ID(N'[dbo].[Comands]') AND type in (N'U'))
-DROP TABLE [dbo].[Comands]
+WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND type in (N'U'))
+DROP TABLE [dbo].[Users]
 
-CREATE TABLE Comands
+
+CREATE TABLE Users
 (
-	ComandId INT PRIMARY KEY NOT NULL DEFAULT (NEXT VALUE FOR dbo.comand_id_sequence),
-	title VARCHAR(255) NOT NULL,
+	userId INT PRIMARY KEY NOT NULL DEFAULT (NEXT VALUE FOR dbo.user_id_sequence),
+	fio NVARCHAR(255) NOT NULL,
+
 );
 
 
 IF  EXISTS (SELECT *
 FROM sys.objects
-WHERE object_id = OBJECT_ID(N'[dbo].[Participants]') AND type in (N'U'))
-DROP TABLE [dbo].[Participants]
+WHERE object_id = OBJECT_ID(N'[dbo].[Addresses]') AND type in (N'U'))
+DROP TABLE [dbo].[Addresses]
 GO
 
-CREATE TABLE Participants
+CREATE TABLE Addresses
 (
-	ParticipantID INT IDENTITY(1,1) PRIMARY KEY ,
-	fio NVARCHAR(255),
-	comandId INT NOT NULL,
-	CONSTRAINT FK_Comand FOREIGN KEY (comandId) REFERENCES Comands (ComandId)
-    ON DELETE CASCADE
+	AddressId INT PRIMARY KEY NOT NULL DEFAULT (NEXT VALUE FOR dbo.address_id_sequence),
+	userId INT,
+	street NVARCHAR(255),
+	city NVARCHAR(255)
+
+		FOREIGN KEY (userId) REFERENCES Users(userId)
+	ON DELETE CASCADE,
+	CONSTRAINT UC_UserId UNIQUE (userId),
+	CONSTRAINT UC_uniqAdr UNIQUE (street,city)
 );
-
-
-GO
-DROP VIEW IF EXISTS ComandParticipantsView
-GO
-
-CREATE VIEW ComandParticipantsView
-AS
-	SELECT comand.ComandId, participant.ParticipantID, comand.title, participant.fio
-	FROM Comands AS comand JOIN Participants as participant ON comand.ComandId = participant.comandId
-GO
 
 -- 1. Для одной из таблиц пункта 2 задания 7 создать триггеры на вставку, удаление и обновления,
 -- при выполнении заданных условий один из триггеров должен инициировать возникновение ошибки (RAISERROR / THROW).
-
-DROP TRIGGER IF EXISTS CheckFIO;
-DROP TRIGGER IF EXISTS delete_participant_trigger;
-DROP TRIGGER IF EXISTS update_view_tringger;
-DROP TRIGGER IF EXISTS delete_view_tringger;
-
 GO
-
 CREATE TRIGGER CheckFIO
-ON Participants
+ON Users
 AFTER INSERT, UPDATE
 AS
 BEGIN
-	SET NOCOUNT ON;
-
 	IF EXISTS (
         SELECT 1
-	FROM INSERTED
+	FROM inserted
 	WHERE NOT EXISTS (
             SELECT 1
 	FROM STRING_SPLIT(fio, ' ')
@@ -100,134 +95,134 @@ BEGIN
         )
     )
     BEGIN
-		RAISERROR('Некорректное ФИО!', 16, 1);
+		RAISERROR('Некорректное ФИО!', 0, 1);
 		ROLLBACK;
 	END
 END;
+
 GO
 CREATE TRIGGER delete_trigger
-ON Participants
-FOR DELETE
+ON Users
+INSTEAD OF DELETE
 AS
 BEGIN
-	DECLARE @fio NVARCHAR(255);
-	SET NOCOUNT ON;
-
-	DECLARE delete_cursor CURSOR FOR
-    SELECT fio
-	FROM deleted;
-
-	OPEN delete_cursor;
-
-	FETCH NEXT FROM delete_cursor INTO @fio;
-
-	WHILE @@FETCH_STATUS = 0
-    BEGIN
-		PRINT 'Участник [' + @fio + '] удалён!';
-		FETCH NEXT FROM delete_cursor INTO @fio;
-	END
-
-	CLOSE delete_cursor;
-	DEALLOCATE delete_cursor;
-
+	IF(NOT EXISTS(SELECT *
+	FROM Users
+	WHERE userId = (SELECT userId
+	FROM deleted) ))
+	BEGIN
+		RAISERROR('Такого пользователя не сущетсвует!',0,1)
+		ROLLBACK;
+	END;
+	UPDATE Users SET fio = '[Данные удалены]' WHERE userId = (SELECT userId
+	FROM deleted)
 END;
 
 GO
-
-
 
 -- 2. для представления пункта 2 задания 7 создать триггеры на вставку, удаление и обновление,
 -- обеспечивающие возможность выполнения операций с данными непосредственно через представление.
 
+
+GO
+DROP VIEW IF EXISTS UserAddressView
+GO
+
+CREATE VIEW UserAddressView
+AS
+	SELECT u.userId, u.fio, adr.city , adr.street
+	FROM Users AS u JOIN Addresses as adr ON u.userId = adr.userId
+GO
 -- Вставка 
-GO
-CREATE TRIGGER insert_view_tringger ON ComandParticipantsView INSTEAD OF INSERT AS 
+CREATE TRIGGER insert_view_trigger ON UserAddressView INSTEAD OF INSERT AS
 BEGIN
-	INSERT INTO Comands
-		(title)
-	SELECT title
-	FROM inserted
 
-	INSERT INTO Participants
-		(fio,comandId )
-	SELECT fio, CONVERT(INT,(SELECT current_value
-		FROM sys.sequences
-		WHERE name = 'comand_id_sequence'))
-	from inserted;
-END
-GO
+	DECLARE for_insert_cursor CURSOR FOR SELECT fio, street, city
+	FROM inserted;
+	DECLARE @fio NVARCHAR(255), @street NVARCHAR(255), @city NVARCHAR(255);
 
--- Обновление 
+
+	OPEN for_insert_cursor;
+
+	FETCH NEXT FROM for_insert_cursor INTO @fio, @street, @city;
+	WHILE @@FETCH_STATUS = 0
+    BEGIN
+	-- Users
+	INSERT INTO users
+		(fio)
+	VALUES(@fio)
+
+	-- Addresses
+	INSERT INTO Addresses
+		(street,city,userId)
+	VALUES(@street, @city, (SELECT CONVERT(INT,(SELECT current_value
+				FROM sys.sequences
+				WHERE name = 'user_id_sequence'))))
+
+	FETCH NEXT FROM for_insert_cursor INTO @fio, @street, @city;
+	END;
+	
+	 CLOSE for_insert_cursor;
+    DEALLOCATE for_insert_cursor;
+END;
+
 GO
-CREATE TRIGGER update_view_tringger ON ComandParticipantsView INSTEAD OF UPDATE AS 
+CREATE TRIGGER update_view_tringger ON UserAddressView INSTEAD OF UPDATE AS
 BEGIN
-	IF(UPDATE(comandId) OR UPDATE(ParticipantID))
+	IF(UPDATE(userId))
 	BEGIN
-		RAISERROR('запрещено обновлять ID!',10,0)
+		RAISERROR('Нельзя менять userId', 10,0)
 		ROLLBACK;
 	END;
 
-	UPDATE Comands
-    SET title = (SELECT title
-	FROM inserted) WHERE ComandId = (SELECT ComandId
-	FROM inserted);
+	-- Users
+	IF(UPDATE(fio))
+	BEGIN
+		UPDATE users SET fio = (SELECT fio
+		FROM inserted) WHERE userId = (SELECT userId
+		FROM inserted);
+	END;
 
-	UPDATE Participants
-    SET fio = (SELECT fio
-	FROM inserted) WHERE ParticipantID = (SELECT ParticipantID
-	FROM inserted);
+	-- Addresses
+	IF(UPDATE(city))
+	BEGIN
+		UPDATE Addresses SET city = (SELECT city
+		FROM inserted) WHERE userId = (SELECT userId
+		FROM inserted);
+	END;
 
-END
+	IF(UPDATE(street))
+	BEGIN
+		UPDATE Addresses SET street = (SELECT street
+		FROM inserted) WHERE userId = (SELECT userId
+		FROM inserted);
+	END;
+
+END;
+
 GO
 
--- Удаление 
-CREATE TRIGGER delete_view_tringger ON ComandParticipantsView INSTEAD OF DELETE AS 
+GO
+CREATE TRIGGER delete_view_tringger ON UserAddressView INSTEAD OF DELETE AS
 BEGIN
-
-	print (SELECT * FROM deleted)
-	DELETE FROM Comands WHERE ComandId IN (SELECT ComandId
+	DELETE FROM Users WHERE userId = (SELECT userId
 	FROM deleted)
 
-END
+END;
 
 GO
 
-INSERT INTO Comands
-	(title)
-VALUES('Команда 1');
--- 1
-INSERT INTO Comands
-	(title)
-VALUES('Команда 2');
+
+INSERT INTO UserAddressView
+	(fio,city,street)
+VALUES('Митрошкин Алексей Антонович', 'Москва', 'Пукшина 29'),
+('Митрошкин Алексей Антонович 2', 'Москва', 'Пукшина 30'),
+('Митрошкин Алексей Антонович 3', 'Москва', 'Пукшина 31'),
+('Митрошкин Алексей Антонович 4', 'Москва', 'Пукшина 32')
 
 
-INSERT INTO Participants
-	( fio, comandId)
-VALUES('Митрошкин Алексей', 1);
-INSERT INTO Participants
-	( fio, comandId)
-VALUES('Токарев Иван', 1);
-
-
-INSERT INTO Participants
-	( fio, comandId)
-VALUES('Василий Пупкин', 2);
-INSERT INTO Participants
-	( fio, comandId)
-VALUES('Дмитрий Дмитриев', 2);
-
-/*
-INSERT INTO Participants
-	( fio, comandId)
-VALUES('Гречко', 1);
-*/
--- Выдаст ошибку по триггеру на вставку 
-
---DELETE FROM Participants WHERE ParticipantID >0;
-
---DELETE FROM ComandParticipantsView WHERE ComandId = 2;
-DELETE FROM ComandParticipantsView WHERE ParticipantID = 4;
+UPDATE UserAddressView SET fio = 'Токарев Иван' WHERE userId = 3;
+UPDATE UserAddressView SET street = 'Yjdjjjasdjaslk0000' WHERE userId = 3;
 
 SELECT *
-FROM ComandParticipantsView;
-
+FROM UserAddressView;
