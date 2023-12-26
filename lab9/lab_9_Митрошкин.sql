@@ -72,8 +72,7 @@ CREATE TABLE Addresses
 	city NVARCHAR(255)
 
 		FOREIGN KEY (userId) REFERENCES Users(userId)
-	ON DELETE CASCADE,
-	CONSTRAINT UC_UserId UNIQUE (userId),
+		CONSTRAINT UC_UserId UNIQUE (userId),
 	CONSTRAINT UC_uniqAdr UNIQUE (street,city)
 );
 
@@ -147,23 +146,23 @@ BEGIN
 	FETCH NEXT FROM for_insert_cursor INTO @fio, @street, @city;
 	WHILE @@FETCH_STATUS = 0
     BEGIN
-	-- Users
-	INSERT INTO users
-		(fio)
-	VALUES(@fio)
+		-- Users
+		INSERT INTO users
+			(fio)
+		VALUES(@fio)
 
-	-- Addresses
-	INSERT INTO Addresses
-		(street,city,userId)
-	VALUES(@street, @city, (SELECT CONVERT(INT,(SELECT current_value
-				FROM sys.sequences
-				WHERE name = 'user_id_sequence'))))
+		-- Addresses
+		INSERT INTO Addresses
+			(street,city,userId)
+		VALUES(@street, @city, (SELECT CONVERT(INT,(SELECT current_value
+					FROM sys.sequences
+					WHERE name = 'user_id_sequence'))))
 
-	FETCH NEXT FROM for_insert_cursor INTO @fio, @street, @city;
+		FETCH NEXT FROM for_insert_cursor INTO @fio, @street, @city;
 	END;
-	
-	 CLOSE for_insert_cursor;
-    DEALLOCATE for_insert_cursor;
+
+	CLOSE for_insert_cursor;
+	DEALLOCATE for_insert_cursor;
 END;
 
 GO
@@ -208,6 +207,9 @@ BEGIN
 	DELETE FROM Users WHERE userId = (SELECT userId
 	FROM deleted)
 
+	DELETE FROM Addresses WHERE userId = (SELECT userId
+	FROM deleted)
+
 END;
 
 GO
@@ -216,13 +218,14 @@ GO
 INSERT INTO UserAddressView
 	(fio,city,street)
 VALUES('Митрошкин Алексей Антонович', 'Москва', 'Пукшина 29'),
-('Митрошкин Алексей Антонович 2', 'Москва', 'Пукшина 30'),
-('Митрошкин Алексей Антонович 3', 'Москва', 'Пукшина 31'),
-('Митрошкин Алексей Антонович 4', 'Москва', 'Пукшина 32')
+	('Митрошкин Алексей Антонович 2', 'Москва', 'Пукшина 30'),
+	('Митрошкин Алексей Антонович 3', 'Москва', 'Пукшина 31'),
+	('Митрошкин Алексей Антонович 4', 'Москва', 'Пукшина 32')
 
 
 UPDATE UserAddressView SET fio = 'Токарев Иван' WHERE userId = 3;
 UPDATE UserAddressView SET street = 'Yjdjjjasdjaslk0000' WHERE userId = 3;
 
+DELETE FROM UserAddressView WHERE userId = 1;
 SELECT *
 FROM UserAddressView;
