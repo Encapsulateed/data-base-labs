@@ -25,14 +25,6 @@ GO
 USE lab_9_db;
 
 
-IF EXISTS (SELECT *
-FROM sys.sequences
-WHERE NAME = N'user_id_sequence')
-DROP SEQUENCE user_id_sequence
-
-CREATE SEQUENCE user_id_sequence 
-	START WITH 1
-	INCREMENT BY 1;
 
 
 
@@ -45,8 +37,11 @@ DROP TABLE [dbo].[Users]
 
 CREATE TABLE Users
 (
-	userId INT PRIMARY KEY NOT NULL DEFAULT (NEXT VALUE FOR dbo.user_id_sequence),
+	userId INT PRIMARY KEY,
 	fio NVARCHAR(255) NOT NULL,
+
+	CONSTRAINT U_ID UNIQUE (userId),
+
 
 );
 
@@ -86,7 +81,7 @@ BEGIN
         )
     )
     BEGIN
-		RAISERROR('Некорректное ФИО!', 0, 1);
+		RAISERROR('Некорректное ФИО!', 14, 3);
 		ROLLBACK;
 	END
 END;
@@ -102,7 +97,7 @@ BEGIN
 	WHERE userId = (SELECT userId
 	FROM deleted) ))
 	BEGIN
-		RAISERROR('Такого пользователя не сущетсвует!',0,1)
+		RAISERROR('Такого пользователя не сущетсвует!',15,4)
 		ROLLBACK;
 	END;
 	UPDATE Users SET fio = '[Данные удалены]' WHERE userId = (SELECT userId
@@ -118,6 +113,14 @@ GO
 GO
 DROP VIEW IF EXISTS UserAddressView
 GO
+DROP TRIGGER IF EXISTS insert_view_trigger
+GO
+
+DROP TRIGGER IF EXISTS update_view_tringger
+GO
+
+DROP TRIGGER IF EXISTS delete_view_tringger
+GO
 
 CREATE VIEW UserAddressView
 AS
@@ -128,41 +131,41 @@ GO
 CREATE TRIGGER insert_view_trigger ON UserAddressView INSTEAD OF INSERT AS
 BEGIN
 
-	DECLARE for_insert_cursor CURSOR FOR SELECT fio, street, city
-	FROM inserted;
-	DECLARE @fio NVARCHAR(255), @street NVARCHAR(255), @city NVARCHAR(255);
+	IF EXISTS (SELECT 1
+	FROM inserted
+	WHERE userId IN (SELECT userId
+	FROM users))
+	BEGIN
+		RAISERROR('Пользователь с таким id уже существует',16,5)
+		ROLLBACK;
+	END
 
+	INSERT INTO users
+		(userId, fio)
+	SELECT userId, fio
+	FROM inserted
 
-	OPEN for_insert_cursor;
+	INSERT INTO Addresses
+		(userId,street,city)
+	SELECT userId, street, city
+	FROM inserted
 
-	FETCH NEXT FROM for_insert_cursor INTO @fio, @street, @city;
-	WHILE @@FETCH_STATUS = 0
-    BEGIN
-		-- Users
-		INSERT INTO users
-			(fio)
-		VALUES(@fio)
-
-		-- Addresses
-		INSERT INTO Addresses
-			(street,city,userId)
-		VALUES(@street, @city, (SELECT CONVERT(INT,(SELECT current_value
-					FROM sys.sequences
-					WHERE name = 'user_id_sequence'))))
-
-		FETCH NEXT FROM for_insert_cursor INTO @fio, @street, @city;
-	END;
-
-	CLOSE for_insert_cursor;
-	DEALLOCATE for_insert_cursor;
 END;
-
 GO
 CREATE TRIGGER update_view_tringger ON UserAddressView INSTEAD OF UPDATE AS
 BEGIN
+	IF NOT EXISTS (SELECT 1
+	FROM inserted
+	WHERE userId IN (SELECT userId
+	FROM users))
+	BEGIN
+		RAISERROR('Такого пользователя не сущетсвует!',10,6)
+	END;
+
+
 	IF(UPDATE(userId))
 	BEGIN
-		RAISERROR('Нельзя менять userId', 10,0)
+		RAISERROR('Нельзя менять userId', 12,2)
 		ROLLBACK;
 	END;
 
@@ -175,7 +178,7 @@ BEGIN
 	END;
 
 	-- Addresses
-	IF(UPDATE(city))
+	IF(UPDATE(city) )
 	BEGIN
 		UPDATE Addresses SET city = (SELECT city
 		FROM inserted) WHERE userId = (SELECT userId
@@ -197,53 +200,59 @@ GO
 CREATE TRIGGER delete_view_tringger ON UserAddressView INSTEAD OF DELETE AS
 BEGIN
 
-	DECLARE for_delete_cursor CURSOR FOR SELECT userId
-	FROM deleted;
-	DECLARE @userId INT;
+	WITH
+		DeletedAddresses
+		AS
+		(
+			SELECT a.userId, a.street, a.city
+			FROM deleted AS d
+				INNER JOIN Addresses AS a ON d.userId = a.userId
+		)
+    DELETE FROM Addresses
+    WHERE EXISTS (
+        SELECT *
+	FROM DeletedAddresses AS da
+	WHERE Addresses.userId = da.userId
+		AND Addresses.street = da.street
+		AND Addresses.city = da.city
+    );
 
-
-	OPEN for_delete_cursor;
-
-	FETCH NEXT FROM for_delete_cursor INTO @userId;
-	WHILE @@FETCH_STATUS = 0
-    BEGIN
-
-
-		IF(NOT EXISTS (SELECT 1 FROM Users WHERE userId = @userId))
-		BEGIN
-			RAISERROR('No such user',10,0)
-			ROLLBACK;
-		END;
-
-		DELETE FROM Users WHERE userId = @userId
-
-		DELETE FROM Addresses WHERE userId = @userId
-
-		FETCH NEXT FROM for_delete_cursor INTO @userId;
-	END;
-
-	CLOSE for_delete_cursor;
-	DEALLOCATE for_delete_cursor;
-
+	DELETE FROM Users
+    WHERE EXISTS (
+        SELECT *
+	FROM deleted AS d
+	WHERE Users.userId = d.userId
+    );
 
 
 END;
 
 GO
 
-
+/*
+*/
 INSERT INTO UserAddressView
-	(fio,city,street)
-VALUES('Митрошкин Алексей Антонович', 'Москва', 'Пукшина 29'),
-	('Митрошкин Алексей Антонович 2', 'Москва', 'Пукшина 30'),
-	('Митрошкин Алексей Антонович 3', 'Москва', 'Пукшина 31'),
-	('Митрошкин Алексей Антонович 4', 'Москва', 'Пукшина 32')
+	(userId,fio,city,street)
+VALUES(1, 'Митрошкин Алексей Антонович', 'Москва', 'Пукшина 29'),
+	(2, 'Митрошкин Алексей Антонович 2', 'Москва', 'Пукшина 30'),
+	(3, 'Митрошкин Алексей Антонович 3', 'Москва', 'Пукшина 31'),
+	(4, 'Митрошкин Алексей Антонович 4', 'Москва', 'Пукшина 32')
 
 
-UPDATE UserAddressView SET fio = 'Токарев Иван' WHERE userId = 3;
-UPDATE UserAddressView SET street = 'Yjdjjjasdjaslk0000' WHERE userId = 3;
 
 
-DELETE FROM UserAddressView WHERE userId > 2;
+
+DELETE FROM UserAddressView WHERE userId = 2;
+
+UPDATE UserAddressView SET fio = 'еблан ебланский гей' WHERE userId = 2;
+
+-- 
 SELECT *
 FROM UserAddressView;
+
+
+-- Select rows from a Table or View '[users]' in schema '[dbo]'
+-- SELECT * FROM Users;
+
+
+
