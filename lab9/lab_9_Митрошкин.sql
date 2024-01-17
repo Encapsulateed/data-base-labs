@@ -244,7 +244,7 @@ VALUES(1, 'Митрошкин Алексей Антонович', 'Москва'
 
 DELETE FROM UserAddressView WHERE userId = 2;
 
-UPDATE UserAddressView SET fio = 'еблан ебланский гей' WHERE userId = 2;
+UPDATE UserAddressView SET fio = 'Токарев Иван ' WHERE userId = 2;
 
 -- 
 SELECT *
