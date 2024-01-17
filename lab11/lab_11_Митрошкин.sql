@@ -90,6 +90,18 @@ WHERE object_id = OBJECT_ID(N'[dbo].[TeamEvent]') AND type in (N'U'))
 DROP TABLE [dbo].[TeamEvent]
 
 
+DROP TRIGGER IF EXISTS trg_insert_classicEvent;
+
+DROP TRIGGER IF EXISTS trg_update_classicEvent
+
+DROP TRIGGER IF EXISTS trg_delete_classicEvent
+
+DROP TRIGGER IF EXISTS trg_insert_hardaton;
+
+DROP TRIGGER IF EXISTS trg_update_hardaton;
+
+DROP TRIGGER IF EXISTS trg_delete_hardaton;
+
 CREATE TABLE Event
 (
     EventId INTEGER PRIMARY KEY NOT NULL,
@@ -112,7 +124,6 @@ CREATE TABLE ClassicEvent
     RegistrationLink NVARCHAR(2048) NOT NULL,
     FOREIGN KEY (EventId) REFERENCES Event(EventId) ON DELETE CASCADE
 );
-
 
 
 CREATE TABLE Hardatons
@@ -206,32 +217,34 @@ BEGIN
         RAISERROR('Поле EventId недоступно для изменения!',10,3)
         ROLLBACK;
     END;
-     IF UPDATE(Name) OR
-       UPDATE(Description) OR
-       UPDATE(PhotoAlbumLink) OR
-       UPDATE(DocumentsLink) OR
-       UPDATE(StartDate) OR
-       UPDATE(EndDate) OR
-       UPDATE(MediaMentionLink) OR
-       UPDATE(Venue)
+    IF UPDATE([Name]) OR
+        UPDATE([Description]) OR
+        UPDATE(PhotoAlbumLink) OR
+        UPDATE(StartDate) OR
+        UPDATE(EndDate) OR
+        UPDATE(MediaMentionLink) OR
+        UPDATE(Venue)
     BEGIN
         RAISERROR('Event fields are immutable throughout the view', 16, 1);
         RETURN;
     END;
 
     -- Обновление данных в ClassicEvent
-    WITH UpdatedClassicEvent AS (
-        SELECT
-            CE.EventId,
-            CE.RegistrationLink
-        FROM INSERTED I
-        INNER JOIN ClassicEvent CE ON I.EventId = CE.EventId
-    )
+    WITH
+        UpdatedClassicEvent
+        AS
+        (
+            SELECT
+                CE.EventId,
+                CE.RegistrationLink
+            FROM INSERTED I
+                INNER JOIN ClassicEvent CE ON I.EventId = CE.EventId
+        )
     UPDATE CE
     SET
         RegistrationLink = U.RegistrationLink
     FROM ClassicEvent CE
-    INNER JOIN UpdatedClassicEvent U ON CE.EventId = U.EventId;
+        INNER JOIN UpdatedClassicEvent U ON CE.EventId = U.EventId;
 
 END
 
@@ -269,13 +282,13 @@ AS
     END;
 
     INSERT INTO Event
-        (EventId,Name,Description, StartDate, EndDate, MediaMentionLink,PhotoAlbumLink,Venue)
-    SELECT EventId, Name, Description, StartDate, EndDate, MediaMentionLink, PhotoAlbumLink, Venue
+        (EventId,[Name],[Description], StartDate, EndDate, MediaMentionLink,PhotoAlbumLink,Venue)
+    SELECT EventId, [Name], [Description], StartDate, EndDate, MediaMentionLink, PhotoAlbumLink, Venue
     FROM inserted;
 
     INSERT INTO Hardatons
         (EventId,ContestTaskLink,OrganizerMessage,OrganizerPhotoLink,StartDateApplications,ResultAnnouncementDate)
-    SELECT ContestTaskLink, OrganizerMessage, OrganizerPhotoLink, StartDateApplications, ResultAnnouncementDate
+    SELECT EventId,ContestTaskLink,OrganizerMessage,OrganizerPhotoLink,StartDateApplications,ResultAnnouncementDate
     FROM inserted;
 END 
 
@@ -318,7 +331,6 @@ BEGIN
     IF UPDATE(Name) OR
         UPDATE(Description) OR
         UPDATE(PhotoAlbumLink) OR
-        UPDATE(DocumentsLink) OR
         UPDATE(StartDate) OR
         UPDATE(EndDate) OR
         UPDATE(MediaMentionLink) OR
@@ -370,10 +382,23 @@ CREATE TABLE EventPartner
     EventID INTEGER,
     PartnerID INTEGER,
     PRIMARY KEY (EventID, PartnerID),
-    FOREIGN KEY (EventID) REFERENCES Event(EventID),
-    FOREIGN KEY (PartnerID) REFERENCES Partner(PartnerID)
+    FOREIGN KEY (EventID) REFERENCES Event(EventID) ON DELETE CASCADE,
+    FOREIGN KEY (PartnerID) REFERENCES Partner(PartnerID) ON DELETE CASCADE
 );
 
+DROP TRIGGER IF EXISTS trg_update_eventPartnert
+
+GO
+CREATE TRIGGER trg_update_eventPartnert ON EventPartner FOR UPDATE 
+AS 
+BEGIN
+    IF(UPDATE(EventID) OR UPDATE(PartnerID))
+    BEGIN
+        RAISERROR('Эти поля недопступны для изменения',5,2);
+        ROLLBACK;
+    END;
+END
+GO
 
 CREATE TABLE Team
 (
@@ -395,16 +420,27 @@ CREATE TABLE Participant
     Specialization NVARCHAR(30) NULL,
 );
 
+ALTER TABLE Team
+ADD CONSTRAINT FK_Team_Captain
+FOREIGN KEY (Captain) REFERENCES Participant(ParticipantId) ON DELETE SET NULL;
+
+ALTER TABLE Participant
+ADD CONSTRAINT FK_Participant_Team
+FOREIGN KEY (TeamId) REFERENCES Team(TeamId) ON DELETE SET NULL;
 
 CREATE TABLE TeamEvent
 (
     TeamId INTEGER,
     EventId INTEGER,
     PRIMARY KEY (TeamId, EventId),
-    FOREIGN KEY (TeamId) REFERENCES Team(TeamId),
-    FOREIGN KEY (EventId) REFERENCES Event(EventId)
+    FOREIGN KEY (TeamId) REFERENCES Team(TeamId) ON DELETE CASCADE,
+    FOREIGN KEY (EventId) REFERENCES Event(EventId) ON DELETE CASCADE
 );
 
+
+
+GO
+use lab_11_db;
 CREATE TABLE Project
 (
     ProjectId INTEGER PRIMARY KEY NOT NULL,
@@ -413,35 +449,24 @@ CREATE TABLE Project
     Name NVARCHAR(100) UNIQUE NOT NULL,
     Description NVARCHAR(500) NOT NULL,
     Photo NVARCHAR(2048) NULL,
-    FOREIGN KEY (EventId) REFERENCES Event(EventId),
-    FOREIGN KEY (TeamId) REFERENCES Team(TeamId)
+    FOREIGN KEY (EventId) REFERENCES Event(EventId) on DELETE CASCADE,
+    FOREIGN KEY (TeamId) REFERENCES Team(TeamId) ON DELETE CASCADE
 );
 
+DROP TRIGGER IF EXISTS trg_update_project
 
-ALTER TABLE Team
-ADD CONSTRAINT FK_Team_Captain
-FOREIGN KEY (Captain) REFERENCES Participant(ParticipantId) ON DELETE SET NULL;
+GO
 
-ALTER TABLE Participant
-ADD CONSTRAINT FK_Participant_Team
-FOREIGN KEY (TeamId) REFERENCES Team(TeamId);
+DROP TRIGGER IF EXISTS trg_update_teamEvent 
 
+GO
+CREATE TRIGGER trg_update_teamEvent ON TeamEvent FOR UPDATE
+AS 
+BEGIN
+    IF(UPDATE(TeamId) OR UPDATE(EventId))
+    BEGIN
+        RAISERROR('Эти поля недопступны для изменения',5,2);
+        ROLLBACK;
+    END;
 
-INSERT INTO Event
-    (EventId,Name,Description,PhotoAlbumLink,DocumentsLink,StartDate,EndDate,Venue)
-VALUES(
-        1, 'ГЕЙ ТУСА', 'gaY PARTYY YEAH', 'WWW.GAY.RU', 'GAY.DOC', '2023-01-12', '2023-01-12', 'гей бар')
-
-
-INSERT INTO ClassicEvent
-    (EventId,RegistrationLink)
-VALUES
-    (1, 'геи.reg')
-
-DELETE FROM ClassicEvent WHERE EventId = 1;
-
-SELECT *
-FROM Event;
-
-SELECT *
-from ClassicEvent;
+END
