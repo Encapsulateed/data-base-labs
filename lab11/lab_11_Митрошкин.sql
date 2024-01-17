@@ -201,7 +201,7 @@ GO
 
 CREATE TRIGGER trg_update_classicEvent ON EventClassicEventView INSTEAD OF UPDATE AS
 BEGIN
-    IF NOT EXISTS(SELECT 1
+    IF  EXISTS(SELECT 1
     FROM Event
     WHERE EventId IN (SELECT EventId
     FROM inserted))

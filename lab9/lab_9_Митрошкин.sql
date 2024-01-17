@@ -25,10 +25,6 @@ GO
 USE lab_9_db;
 
 
-
-
-
-
 IF  EXISTS (SELECT *
 FROM sys.objects
 WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND type in (N'U'))
@@ -39,10 +35,7 @@ CREATE TABLE Users
 (
 	userId INT PRIMARY KEY,
 	fio NVARCHAR(255) NOT NULL,
-
-	CONSTRAINT U_ID UNIQUE (userId),
-
-
+	CONSTRAINT U_ID UNIQUE (userId)
 );
 
 
@@ -249,10 +242,3 @@ UPDATE UserAddressView SET fio = 'Токарев Иван ' WHERE userId = 2;
 -- 
 SELECT *
 FROM UserAddressView;
-
-
--- Select rows from a Table or View '[users]' in schema '[dbo]'
--- SELECT * FROM Users;
-
-
-
